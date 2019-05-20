@@ -79,6 +79,7 @@ enum Set {
 	"Brigade of the Sky",
 	"Omen of the Ten",
 	"Altersphere",
+	"Steel Rebellion",
 	"Promotional" = 70000,
 	"Token" = 90000
 }
@@ -87,39 +88,91 @@ class SVLookup implements MessageHandler {
 
 	private _cards: Card[];
 	static aliases: Alias = {
-		"succ": "support cannon",
-		"jormongoloid": "jormungand",
-		"jungle albert": "jungle warden",
-		"shadow albert": "underworld ruler aisha",
-		"caboose": "carabosse",
+		//Basic
 		"weebblader": "ta-g, katana unsheathed",
+		"dg": "dark general",
+		//Classic
+		"ding dong": "bellringer angel",
+		"ptp": "path to purgatory",
+		"satan": "prince of darkness",
+		"stan": "prince of darkness",
+		"epm": "elven princess mage",
+		"rosetta": "rose queen",
+		"dshift": "dimension shift",
+		"awoo": "cerberus",
+		"atomeme": "lord atomy",
+		//DE
+		"old levi": "timeworn mage levi",
+		"dod": "dance of death",
+		"beelzebub": "lord of the flies",
+		//RoB
+		"no mere duck": "hamsa",
+		"coc": "call of cocytus",
+		"jo pendant": "dragonclaw pendant",
+		"tribunal of rigged evil": "tribunal of good and evil",
+		//TotG
+		"jungle albert": "jungle warden",
+		"pepe": "vagabond frog",
+		"succ": "support cannon",
+		"mutabolt": "mutagenic bolt",
+		"eggs": "dragon's nest",
+		"candle": "candelabra of prayers",
+		"squidward": "octobishop",
+		//WLD
+		"ursula": "queen of the dread sea",
+		"eta": "elf twins' assault",
+		"tokenfucker9000": "wood of brambles",
+		"happy tree": "kindly treant",
+		"bnb": "beauty and the beast",
+		"cock": "council of card knights",
 		"antiguy": "hero of antiquity",
 		"heroic guy": "hero of antiquity",
 		"hero of guy": "hero of antiquity",
-		"pepe": "vagabond frog",
-		"ding dong": "bellringer angel",
-		"awoo": "cerberus",
-		"dshift": "dimension shift",
-		"cock": "council of card knights",
-		"desu xd": "deus ex machina",
-		"big dong": "shining bellringer angel",
-		"super dong": "shining bellringer angel",
-		"coc": "call of cocytus",
-		"sibyl 2": "ceres of the night",
+		"young levi": "master mage levi",
+		"yung levi": "master mage levi",
+		"bkb": "big knuckle bodyguard",
+		"caboose": "carabosse",
+		//SFL
+		"rta": "round table assembly",
 		"gas bird": "andrealphus",
 		"peacock": "andrealphus",
-		"tempest lancer": "lancer of the tempest",
-		"tribunal of rigged evil": "tribunal of good and evil",
-		"ptp": "path to purgatory",
-		"bnb": "beauty and the beast",
-		"the wife": "hot garbage",
-		"aurelia alter": "darksaber melissa",
+		"gold sibyl": "ceres of the night",
+		"jormongoloid": "jormungand",
+		"pdk": "prime dragon keeper",
+		//Chronogenesis
+		"big dong": "shining bellringer angel",
+		"super dong": "shining bellringer angel",
 		"ffg": "fall from grace",
-		"satan": "prince of darkness",
-		"stan": "prince of darkness",
+		"tempest lancer": "lancer of the tempest",
+		"aurelia alter": "darksaber melissa",
+		"skill ring": "skull ring",
+		"shadow albert": "underworld ruler aisha",
+		"pure anal": "pure annihilation",
+		"desu xd": "deus ex machina",
 		"gun": "god bullet golem",
-		"skill ring": "skull ring"
-
+		//DBNE
+		"smartacus": "spartacus",
+		"skyboat": "sky fortress",
+		"dfb": "darkfeast bat",
+		"ptp with legs": "hinterland ghoul",
+		"tenko cannon": "tenko's shrine",
+		"friend cannon": "tenko's shrine",
+		//Brigade
+		"lego fighter": "legendary fighter",
+		"uncle": "cagliostro, adorable genius",
+		"potato": "arulumaya, mystic seer",
+		"dlf": "de la fille, gem princess",
+		//Omen
+		"jerry": "mjerrabaine, omen of one",
+		"better candle": "city of gold",
+		"fat guy": "marwynn, omen of repose",
+		//Altersphere
+		"rune albert": "zealot of truth",
+		//SR
+		"shadow sibyl": "ceres, eternal bride",
+		"yeehaw": "dragon ranch",
+		//memes
+		"the wife": "hot garbage"
 	};
 	private flagHelp: String = "{{a/cardname}} - display card **a**rt\n" + 
 		"{{e/cardname}} - **e**volved card art\n" +
@@ -379,8 +432,8 @@ class SVLookup implements MessageHandler {
 						await this.sendError(`"${card.card_name}" doesn't have evolved art.`, "", discordInfo);
 						continue;
 					}
-					const cleanName = card.card_name.toLowerCase().replace(/\W/g, '').trim();
-					embed.setImage("http://sv.bagoum.com/getRawImage/" + (evolved ? "1" : "0") + "/" + (alternate) + "/" + cleanName);
+					// const cleanName = card.card_name.toLowerCase().replace(/\W/g, '').trim();
+					embed.setImage("http://sv.bagoum.com/getRawImage/" + (evolved ? "1" : "0") + "/" + (alternate) + "/" + card.base_card_id);
 					if (matches > 1 && !alternate)
 						embed.setFooter(`Alt art available! Try "a2" or "e2"`);
 					if (matches > 2 && alternate == 1)
@@ -410,7 +463,7 @@ class SVLookup implements MessageHandler {
 						legality = "";
 					let sanitizedTribe = (card.tribe_name == "-") ? "" : `(${card.tribe_name})`;
 					embed.setURL(`http://sv.bagoum.com/cards/${card.card_id}`)
-					.setThumbnail(`https://shadowverse-portal.com/image/card/en/C_${card.card_id}.png`)
+					.setThumbnail(`https://sv.bagoum.com/cardF/en/c/${card.card_id}`)
 					.setFooter(Craft[card.clan] + " " + Rarity[card.rarity] + " - " + Set[card.card_set_id] + " " + legality);
 					switch (card.char_type) {
 						case 1: {
