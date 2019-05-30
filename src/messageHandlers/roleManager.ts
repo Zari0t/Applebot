@@ -28,7 +28,7 @@ class RoleManager implements MessageHandler {
 
 		if (args[0] != "!role")
 			return;
-		if (msg.guild.name != "HITBOX DIMENSION" && msg.guild.name != "bot testing fuckery") // don't worry about it
+		if (msg.guild.name != "HITBOX DIMENSION" && msg.guild.name != "bot testing fuckery" && msg.guild.id != "306213252625465354") // don't worry about it
 			return;
 
 		switch (args[1].toLowerCase()) {

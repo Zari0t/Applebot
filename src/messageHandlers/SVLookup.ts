@@ -5,7 +5,19 @@ import MessageFloodgate from "../messageFloodgate";
 import * as Discord from "discord.js";
 import DiscordExtendedInfo from "../extendedInfos/discordExtendedInfo";
 import fetch from "node-fetch";
+import * as fs from "fs";
 
+function readSettings(): Promise<string> {
+	return new Promise((resolve, reject) => {
+		fs.readFile("resources/imgur.json", "utf8", (err, data) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(data);
+			}
+		})
+	});
+}
 interface Card {
 	card_id: number,
 	card_name: string,
@@ -87,6 +99,7 @@ enum Set {
 class SVLookup implements MessageHandler {
 
 	private _cards: Card[];
+	private _imgurToken: string;
 	static aliases: Alias = {
 		//Basic
 		"weebblader": "ta-g, katana unsheathed",
@@ -182,8 +195,9 @@ class SVLookup implements MessageHandler {
 		"{{sr/text}} - **s**earch **r**otation cards\n" +
 		"{{d/deckcode}} - Display **d**eck\n"
 	
-	private constructor(cards: Card[]) {
+	private constructor(cards: Card[], imgurToken: string) {
 		this._cards = cards;
+		this._imgurToken = imgurToken;
 	}
 
 	public static async create() {
@@ -198,7 +212,9 @@ class SVLookup implements MessageHandler {
 			c.evo_description = SVLookup.escape(c.evo_description)
 		}
 		console.log(`Starting SVLookup with ${cards.length} cards`);
-		return new SVLookup(cards);
+		const data = await readSettings();
+		const id = JSON.parse(data).id;
+		return new SVLookup(cards, id);
 	}
 
 	static rotation_legal(c: Card) {
@@ -317,10 +333,19 @@ class SVLookup implements MessageHandler {
 					const deck = (deckJson.cards as Card[]);
 					const vials = deck.map(x => x.use_red_ether).reduce((a, b) => a + b, 0);
 					const format = deck.every(x => x.format_type == 1);
+					const deckImage = await fetch('https://shadowverse-portal.com/image/1?lang=en', {
+						headers: {'Referer': "https://shadowverse-portal.com/deck/" + hash + "?lang=en"}
+					});
+					const imgurReupload = await fetch('https://api.imgur.com/3/image', {
+						method: "POST",
+						headers: {'Authorization': "Client-ID " + this._imgurToken},
+						body: deckImage.body
+					});
+					const imgurJSON = await imgurReupload.json();
 					embed.setFooter(`Deck code expired? Click the link to generate another.`)
 						.setTitle( `${Craft[deckJson.clan]} Deck - ${target}`)
 						.setFooter(`${format ? "Rotation" : "Unlimited"} Format - ${vials} vials - Click link to generate new deck code`)
-						.setImage(`https://shadowverse-portal.com/image/${hash}?lang=en`)
+						.setImage(imgurJSON.data.link)
 						.setURL(`https://shadowverse-portal.com/deck/${hash}`)
 						.setColor(0xF6C7C7);
 					await discordInfo.message.channel.send({embed});
