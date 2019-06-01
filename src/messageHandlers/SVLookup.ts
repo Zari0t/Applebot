@@ -193,7 +193,8 @@ class SVLookup implements MessageHandler {
 		"{{sc/cardname}} - Show card **sc**ript\n" + 
 		"{{s/text}} - **s**earch card text\n" +
 		"{{sr/text}} - **s**earch **r**otation cards\n" +
-		"{{d/deckcode}} - Display **d**eck\n"
+		"{{d/deckcode}} - Display **d**eck\n" +
+		"{{topdeck}} - Random card\n"
 	
 	private constructor(cards: Card[], imgurToken: string) {
 		this._cards = cards;
@@ -357,6 +358,9 @@ class SVLookup implements MessageHandler {
 
 			if (Object.keys(SVLookup.aliases).includes(target))
 				target = SVLookup.aliases[target];
+
+			 if (target.toLowerCase() == "topdeck")
+                target = this._cards[Math.floor( Math.random() * this._cards.length)].card_name.toLowerCase();
 
 			let cards = this._cards.filter(x => x.card_name.toLowerCase().includes(target));
 			if (cards.length < 1) {
