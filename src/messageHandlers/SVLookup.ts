@@ -112,11 +112,14 @@ class SVLookup implements MessageHandler {
 		"epm": "elven princess mage",
 		"rosetta": "rose queen",
 		"dshift": "dimension shift",
+		"greatest topdeck ever": "ethereal form",
 		"awoo": "cerberus",
 		"atomeme": "lord atomy",
 		//DE
-		"old levi": "timeworn mage levi",
+		"la la la": "unicorn dancer unica",
 		"dod": "dance of death",
+		"old levi": "timeworn mage levi",
+		"vampy": "vania, vampire princess",
 		"beelzebub": "lord of the flies",
 		//RoB
 		"no mere duck": "hamsa",
@@ -126,6 +129,7 @@ class SVLookup implements MessageHandler {
 		//TotG
 		"jungle albert": "jungle warden",
 		"pepe": "vagabond frog",
+		"bane rogers": "jolly rogers",
 		"succ": "support cannon",
 		"mutabolt": "mutagenic bolt",
 		"eggs": "dragon's nest",
@@ -137,12 +141,14 @@ class SVLookup implements MessageHandler {
 		"tokenfucker9000": "wood of brambles",
 		"happy tree": "kindly treant",
 		"bnb": "beauty and the beast",
+		"forest aegis": "beauty and the beast",
 		"cock": "council of card knights",
 		"antiguy": "hero of antiquity",
 		"heroic guy": "hero of antiquity",
 		"hero of guy": "hero of antiquity",
 		"young levi": "master mage levi",
 		"yung levi": "master mage levi",
+		"young leviticus": "master mage levi",
 		"bkb": "big knuckle bodyguard",
 		"caboose": "carabosse",
 		//SFL
@@ -164,6 +170,7 @@ class SVLookup implements MessageHandler {
 		"desu xd": "deus ex machina",
 		"gun": "god bullet golem",
 		//DBNE
+		"monkey": "white vanara",
 		"smartacus": "spartacus",
 		"skyboat": "sky fortress",
 		"dfb": "darkfeast bat",
@@ -178,18 +185,21 @@ class SVLookup implements MessageHandler {
 		//Omen
 		"jerry": "mjerrabaine, omen of one",
 		"better candle": "city of gold",
+		"candle 2": "city of gold",
 		"fat guy": "marwynn, omen of repose",
 		//Altersphere
+		"alberta": "dionne, dancing blade",
 		"rune albert": "zealot of truth",
 		//SR
 		"shadow sibyl": "ceres, eternal bride",
+		"ceres 2": "ceres, eternal bride",
 		"yeehaw": "dragon ranch",
 		//memes
 		"the wife": "hot garbage"
 	};
 	private flagHelp: String = "{{a/cardname}} - display card **a**rt\n" + 
 		"{{e/cardname}} - **e**volved card art\n" +
-		"{{l/cardname}} - display **l**ore / flavor text\n" +
+		"{{l/cardname}} - display **l**ore / **f**lavor text\n" +
 		"{{sc/cardname}} - Show card **sc**ript\n" + 
 		"{{s/text}} - **s**earch card text\n" +
 		"{{sr/text}} - **s**earch **r**otation cards\n" +
@@ -359,8 +369,8 @@ class SVLookup implements MessageHandler {
 			if (Object.keys(SVLookup.aliases).includes(target))
 				target = SVLookup.aliases[target];
 
-			 if (target.toLowerCase() == "topdeck")
-                target = this._cards[Math.floor( Math.random() * this._cards.length)].card_name.toLowerCase();
+			if (target.toLowerCase() == "topdeck")
+                		target = this._cards[Math.floor(Math.random() * this._cards.length)].card_name.toLowerCase();
 
 			let cards = this._cards.filter(x => x.card_name.toLowerCase().includes(target));
 			if (cards.length < 1) {
@@ -470,12 +480,37 @@ class SVLookup implements MessageHandler {
 					break;
 				}
 				case "f":
-				case "l": {
+				case "l": 
+				case "f2":
+				case "l2":
+				case "f3":
+				case "l3": {
+					let alternate = 0;
+					if (["f2", "l2"].includes(options))
+						alternate = 1;
+					if (["f3", "l3"].includes(options))
+						alternate = 2;
+					let matches = this._cards.filter(x => x.card_name == cardname).length
+					if (card.base_card_id != card.normal_card_id) { // alternate reprints (Ta-G, AGRS, etc)
+						let baseID = card.base_card_id; // TODO: filter syntax
+						let newcard = this._cards.filter(x => x.card_id == baseID)[0];
+						if (newcard.card_name != card.card_name) {
+							alternate = 1;
+							card = newcard;
+						}
+					} else if (alternate != 0 && matches <= alternate) {
+						await this.sendError(`Couldn't find additional lore for "${card.card_name}".`, "", discordInfo);
+						continue;
+					}
 					embed.setThumbnail(`https://shadowverse-portal.com/image/card/en/C_${card.card_id}.png`);
 					if (card.char_type == 1)
 						embed.setDescription("*" + card.description + "\n\n" + card.evo_description + "*");
 					else
 						embed.setDescription("*" + card.description + "*");
+					if (matches > 1 && !alternate)
+						embed.setFooter(`Alt lore available! Try "f2" or "l2"`);
+					if (matches > 2 && alternate == 1)
+						embed.setFooter(`Additional lore available! Try "f3" or "l3"`);
 					break;
 				}
 				case "sc": {
