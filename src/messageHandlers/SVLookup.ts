@@ -92,6 +92,7 @@ enum Set {
 	"Omen of the Ten",
 	"Altersphere",
 	"Steel Rebellion",
+	"Rebirth of Glory",
 	"Promotional" = 70000,
 	"Token" = 90000
 }
@@ -183,6 +184,7 @@ class SVLookup implements MessageHandler {
 		"potato": "arulumaya, mystic seer",
 		"dlf": "de la fille, gem princess",
 		//Omen
+		"gacha golem": "orichalcum golem",
 		"jerry": "mjerrabaine, omen of one",
 		"better candle": "city of gold",
 		"candle 2": "city of gold",
